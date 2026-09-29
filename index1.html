@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Akash Chakra — BAPS intelligent spectrum operations prototype">
+<title>Akash Chakra — BAPS Spectrum Operations</title>
+<style>
+:root{
+  --bg:#050b10;--surface:#0a141b;--surface2:#0d1b23;--surface3:#10232c;
+  --line:#17333d;--line2:#244b57;--text:#e8f6f8;--muted:#71909a;
+  --cyan:#37d9ea;--cyan2:#75edf6;--green:#54e3a2;--red:#ff687b;--amber:#f2b94b;
+  --violet:#9b7bff;--shadow:0 16px 45px rgba(0,0,0,.25)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+ radial-gradient(circle at 76% -5%,rgba(35,117,132,.16),transparent 30%),
+ radial-gradient(circle at 10% 70%,rgba(38,78,99,.08),transparent 28%),var(--bg);
+ color:var(--text);font:12px Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+button,select{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:228px;background:rgba(6,15,21,.96);border-right:1px solid var(--line);padding:20px 14px;z-index:20;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.mark{width:35px;height:35px;border:1px solid #2c6471;border-radius:10px;display:flex;align-items:flex-end;justify-content:center;gap:3px;padding:7px;background:linear-gradient(145deg,#0b2029,#09151b)}
+.mark i{display:block;width:4px;background:var(--cyan);border-radius:5px;box-shadow:0 0 9px rgba(55,217,234,.3)}
+.mark i:nth-child(1){height:8px}.mark i:nth-child(2){height:15px}.mark i:nth-child(3){height:22px}
+.brand b{font-size:17px;letter-spacing:.16em}.brand small{display:block;color:#587780;font:7px ui-monospace,monospace;letter-spacing:.14em;margin-top:3px}
+.status{border:1px solid #17414b;background:#091c23;border-radius:8px;padding:9px;color:#9ab8c0;font:8px ui-monospace,monospace}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green);margin-right:6px}
+nav{display:grid;gap:4px;margin-top:19px}
+nav button{border:1px solid transparent;background:transparent;color:#6e8993;text-align:left;padding:10px 11px;border-radius:7px;font-size:10px}
+nav button:hover,nav button.active{background:#0c252d;color:#ecfdff;border-color:#1a424c}
+nav button.active{box-shadow:inset 2px 0 var(--cyan)}
+.side-meta{margin-top:auto;border:1px solid var(--line);background:#09151c;border-radius:9px;padding:12px}
+.side-meta .ey{color:#55737d;font:7px ui-monospace,monospace;letter-spacing:.13em}
+.side-meta strong{display:block;font-size:10px;margin:7px 0 11px}
+.spec{display:flex;justify-content:space-between;color:#607c86;font:8px ui-monospace,monospace;margin:7px 0}.spec b{color:#bcd6db}
+.main{margin-left:228px;min-width:0}
+.topbar{min-height:78px;border-bottom:1px solid var(--line);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.kicker{font:8px ui-monospace,monospace;color:#5c8993;letter-spacing:.15em}
+h1{font-size:20px;line-height:1.15;margin:5px 0 4px;letter-spacing:-.02em}.sub{color:var(--mut);font-size:10px}
+.actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.clock{font:8px ui-monospace,monospace;color:#68858e;margin-right:4px}
+.btn{border:1px solid #244752;background:#091820;color:#b9d2d7;border-radius:7px;padding:8px 10px;font-size:9px;transition:.18s}
+.btn:hover{border-color:var(--cyan);color:#eaffff}.btn.primary{background:#103b46;border-color:#2c7a89;color:#eaffff}.btn.warn{border-color:#60452a;color:#f5c568}
+.btn.danger{border-color:#612e38;color:#ff8998}
+.toolbar{padding:9px 28px;border-bottom:1px solid var(--line);background:rgba(7,17,23,.8);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.toolbar label{font:8px ui-monospace,monospace;color:#607d87}.toolbar select{margin-left:5px;background:#0b1b23;color:#c4d9dd;border:1px solid #1d3c47;border-radius:6px;padding:6px 8px;font-size:9px}.spacer{flex:1}
+.mode{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}.mode button{border:0;background:#09151b;color:#607d87;padding:7px 10px;font:8px ui-monospace,monospace}.mode button.active{background:#122c34;color:var(--amber)}
+.wrap{padding:16px 28px 32px;max-width:1700px;margin:auto}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.card{background:linear-gradient(180deg,rgba(13,29,38,.95),rgba(8,19,25,.95));border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow)}
+.kpi{padding:12px 13px;min-height:91px;position:relative;overflow:hidden}.kpi small{font:7px ui-monospace,monospace;color:#63808a;letter-spacing:.07em}.kpi h2{font:22px ui-monospace,monospace;margin:10px 0 5px}.kpi footer{display:flex;justify-content:space-between;color:#506c76;font:7px ui-monospace,monospace}
+.grid-main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(310px,.72fr);gap:9px;margin-top:9px}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 13px;border-bottom:1px solid var(--line)}.ey{font:7px ui-monospace,monospace;color:#5d8791;letter-spacing:.14em}.panel-head h3{margin:5px 0 0;font-size:12px}
+.heatbox{height:350px;padding:12px}.heatbox canvas,.mini canvas{width:100%;height:100%;display:block;border:1px solid #173943;border-radius:6px;background:#040d12}
+.decision-main{display:flex;align-items:center;gap:14px;padding:18px 14px}
+.ring{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--cyan) 0 230deg,#17343d 230deg);position:relative;flex:0 0 auto}.ring:after{content:"";position:absolute;inset:5px;border-radius:50%;background:#09171e}.ring div{position:relative;z-index:1;text-align:center;font:13px ui-monospace,monospace}.ring small{display:block;color:#607e88;font-size:6px;margin-top:2px}
+.freq{font:19px ui-monospace,monospace}.dwell{font-size:9px;color:#66818b;margin-top:6px}.dwell b{color:#b9d5da}
+.score{border-top:1px solid var(--line);padding:11px 13px}.score-row{margin:8px 0}.score-row>span{display:flex;justify-content:space-between;color:#708c95;font-size:8px}.score-row b{color:#c5dde1;font:8px ui-monospace,monospace}.bar{height:4px;border-radius:4px;background:#102832;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:var(--cyan);width:0;transition:width .35s}.bar.neg i{background:var(--red)}
+.total{border-top:1px dashed #1a3842;margin-top:10px;padding-top:9px;display:flex;justify-content:space-between;color:#59747e;font:8px ui-monospace,monospace}.total b{color:var(--cyan);font-size:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:9px}
+.console{padding:16px 13px}.bigfreq{font:27px ui-monospace,monospace}.bigfreq span{font-size:10px;color:#5e7a84}.progress{height:7px;background:#102731;border-radius:5px;overflow:hidden;margin:13px 0 8px}.progress i{height:100%;display:block;width:0;background:linear-gradient(90deg,#18a8bd,#58e4c0);transition:.4s}.meta{display:flex;justify-content:space-between;color:#536e78;font:7px ui-monospace,monospace}.meta b{color:#b9d3d8}.result{border-top:1px solid var(--line);padding:10px 13px}.result .state{font:8px ui-monospace,monospace;color:#6b8790}.result-grid{display:grid;grid-template-columns:repeat(3,1fr);margin-top:9px}.result-grid small{display:block;color:#506b75;font:7px ui-monospace,monospace}.result-grid b{font:12px ui-monospace,monospace}
+.scroll{max-height:178px;overflow:auto}.empty{text-align:center;color:#506a73;padding:34px 10px;font-size:9px}.track{display:grid;grid-template-columns:28px 1fr auto;gap:8px;padding:9px 12px;border-bottom:1px solid #152e37}.avatar{width:27px;height:27px;border:1px solid #275765;border-radius:6px;display:grid;place-items:center;color:var(--cyan);font:8px ui-monospace,monospace}.track small{color:#5c7882;font:7px ui-monospace,monospace}.green{color:var(--green)}
+.event{display:grid;grid-template-columns:55px 40px 1fr;gap:6px;padding:7px 12px;border-bottom:1px solid #142a33;font:7px ui-monospace,monospace}.event time{color:#47636d}.event .type{color:var(--cyan)}.event.hit .type{color:var(--green)}.event.miss .type{color:var(--red)}
+.compare{margin-top:9px}.table{font:8px ui-monospace,monospace}.tr{display:grid;grid-template-columns:1.35fr .7fr .7fr .7fr 1fr;gap:5px;padding:9px 13px;border-bottom:1px solid #152d36;align-items:center}.th{color:#506b75;font-size:7px}.bar2{height:4px;background:#122832;border-radius:4px;overflow:hidden}.bar2 i{display:block;height:100%;width:0;background:var(--cyan);transition:.35s}
+.bottom{display:grid;grid-template-columns:1.1fr .9fr;gap:9px;margin-top:9px}.beliefs{padding:13px;display:grid;grid-template-columns:repeat(9,1fr);gap:7px;min-height:145px;align-items:end}.bc{text-align:center;color:#66808a;font:7px ui-monospace,monospace}.bt{height:78px;background:#102731;border-radius:4px;display:flex;align-items:flex-end;margin:4px 0}.bt i{width:100%;height:0;background:linear-gradient(#55e7d0,#159bb6);border-radius:4px;transition:.35s}.flow{padding:16px 13px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;color:#6e8992;font:7px ui-monospace,monospace}.flow span{border:1px solid #1c424c;background:#0a2028;border-radius:5px;padding:6px;color:#8bcbd3}.arch{border-top:1px solid var(--line);padding:12px 13px;display:grid;gap:7px;font-size:8px}.arch b{color:#a9d8dd}.arch span{color:#5c7780;margin-left:7px}
+.intel{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}.mini{padding:0 13px 13px}.mini canvas{height:150px}.mini-note{display:flex;justify-content:space-between;padding:10px 0 7px;color:#607b84;font:7px ui-monospace,monospace}.mini-note b{color:#bcd5d9}
+.toast{position:fixed;right:20px;bottom:20px;background:#091820;border:1px solid var(--cyan);border-radius:7px;padding:10px 14px;color:#dff6f8;box-shadow:0 15px 40px #0009;opacity:0;transform:translateY(10px);transition:.25s;z-index:100}.toast.show{opacity:1;transform:none}
+.modal{position:fixed;inset:0;background:#02070bbd;backdrop-filter:blur(4px);z-index:90;display:none;place-items:center;padding:20px}.modal.open{display:grid}.modal-card{width:min(700px,100%);background:#091820;border:1px solid var(--line2);border-radius:10px;box-shadow:0 30px 90px #000b;padding:18px}.modal-card h2{margin:0 0 7px;font-size:16px}.modal-card p{color:#8aa4ac;font-size:10px;line-height:1.6}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}.modal-item{border:1px solid var(--line);border-radius:7px;padding:10px;background:#0b1a22}.modal-item b{display:block;color:var(--cyan);font-size:9px;margin-bottom:4px}.modal-item span{color:#78939c;font-size:8px}
+.panic{position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,transparent,#b52e42cc,transparent);padding:7px;text-align:center;color:#fff;font:bold 10px ui-monospace,monospace;letter-spacing:.2em;z-index:80;display:none}.panic.on{display:block}
+body.alert .card{border-color:#65313b}body.alert .ring{filter:drop-shadow(0 0 10px rgba(255,104,123,.45))}
+@media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.grid-main{grid-template-columns:1fr}.intel{grid-template-columns:1fr}.bottom{grid-template-columns:1fr}}
+@media(max-width:850px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0}.side-meta{display:none}.wrap,.topbar,.toolbar{padding-left:14px;padding-right:14px}.row3{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}.actions{justify-content:flex-start}.kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.kpis{grid-template-columns:1fr}.beliefs{grid-template-columns:repeat(6,1fr)}.tr{grid-template-columns:1.3fr .7fr .7fr}.tr>*:nth-child(5){display:none}.toolbar{align-items:flex-start}.mode{width:100%}.mode button{flex:1}}
+</style>
+</head>
+<body>
+<div class="panic" id="panicBanner">CRITICAL · MULTIPLE HIGH-ACTIVITY BANDS · RECEIVER PRIORITY MODE</div>
+
+<aside class="sidebar">
+  <div class="brand"><div class="mark"><i></i><i></i><i></i></div><div><b>AKASH CHAKRA</b><small>BAPS SPECTRUM INTELLIGENCE</small></div></div>
+  <div class="status"><span class="dot"></span>SIMULATION ONLINE · SIH26055</div>
+  <nav>
+    <button class="active" data-section="ops">◉ Operations</button>
+    <button data-section="spectrum">▦ Spectrum</button>
+    <button data-section="scheduler">⌁ Scheduler</button>
+    <button data-section="tracks">◎ Tracks</button>
+    <button data-section="performance">◫ Performance</button>
+  </nav>
+  <div class="side-meta">
+    <div class="ey">RECEIVER PROFILE</div><strong>NARROWBAND ESM</strong>
+    <div class="spec"><span>Instantaneous BW</span><b>20 MHz</b></div>
+    <div class="spec"><span>Retune latency</span><b>4 ms</b></div>
+    <div class="spec"><span>Dwell range</span><b>20–200 ms</b></div>
+    <div class="spec"><span>Engine</span><b>BAPS v1.0</b></div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div><div class="kicker">SMART SCAN STRATEGY FOR ELECTRONIC WARFARE</div><h1>Belief-Aware Predictive Scan Scheduler</h1><div class="sub">Adaptive spectrum sensing with uncertainty-aware scheduling.</div></div>
+    <div class="actions"><span class="clock" id="clock"></span><button class="btn" id="help">How it works</button><button class="btn" id="export">Export</button><button class="btn danger" id="panic">Priority Alert</button><button class="btn primary" id="run">Run Scan Cycle</button></div>
+  </header>
+
+  <div class="toolbar">
+    <label>SCENARIO <select id="scenario"><option value="mixed">Mixed Agile</option><option value="periodic">Periodic Emitter</option><option value="hopping">Frequency Hopping</option><option value="emerging">Emerging Emitter</option><option value="dense">Dense Multi-Emitter</option></select></label>
+    <label>BANDS <select id="bands"><option value="18">18</option><option value="36">36</option><option value="72">72</option></select></label>
+    <label>POLICY <select id="policy"><option value="baps">BAPS</option><option value="sequential">Sequential</option><option value="random">Random</option><option value="greedy">Greedy</option></select></label>
+    <div class="mode"><button class="active" data-mode="training">TRAINING</button><button data-mode="operational">OPERATIONAL</button><button data-mode="cooperative">COOPERATIVE</button></div>
+    <span class="spacer"></span><button class="btn" id="auto">AUTO · OFF</button><span style="font:8px ui-monospace,monospace;color:#5d7a84">SIM <b id="sim">00:00.000</b></span>
+  </div>
+
+  <div class="wrap" id="ops">
+    <section class="kpis">
+      <div class="card kpi"><small>PROBABILITY OF INTERCEPT</small><h2 id="pi">0.0%</h2><footer><span>current run</span><span>PI</span></footer></div>
+      <div class="card kpi"><small>AVERAGE INTERCEPT TIME</small><h2 id="ait">—</h2><footer><span>seconds</span><span id="aitn">waiting</span></footer></div>
+      <div class="card kpi"><small>DETECTION PROBABILITY</small><h2 id="pd">0.0%</h2><footer><span>hits / opportunities</span><span id="hm">0 / 0</span></footer></div>
+      <div class="card kpi"><small>FALSE ALARM RATE</small><h2 id="pfa">0.0%</h2><footer><span>simulated receiver</span><span id="fa">0 false</span></footer></div>
+      <div class="card kpi"><small>SCAN CYCLES</small><h2 id="cycles">0</h2><footer><span>live run</span><span id="modeLabel">TRAINING</span></footer></div>
+    </section>
+
+    <section class="grid-main" id="spectrum">
+      <div class="card">
+        <div class="panel-head"><div><div class="ey">LIVE SPECTRUM</div><h3>Frequency × Time Activity Map</h3></div><span class="ey">LOW · ACTIVITY · HIGH · SCAN</span></div>
+        <div class="heatbox"><canvas id="heatmap"></canvas></div>
+      </div>
+      <div class="card" id="scheduler">
+        <div class="panel-head"><div><div class="ey">BAPS DECISION</div><h3>Next Action</h3></div><span class="ey">EXPLAINABLE</span></div>
+        <div class="decision-main"><div class="ring" id="ring"><div><span id="db">B-01</span><small>NEXT</small></div></div><div><div class="freq" id="df">900 MHz</div><div class="dwell">recommended dwell <b id="dd">80 ms</b></div></div></div>
+        <div class="score">
+          <div class="ey">SCORE(f) BREAKDOWN</div>
+          <div class="score-row"><span>Predicted activity <b id="sp">0</b></span><div class="bar"><i id="bp"></i></div></div>
+          <div class="score-row"><span>Uncertainty <b id="su">0</b></span><div class="bar"><i id="bu"></i></div></div>
+          <div class="score-row"><span>Revisit urgency <b id="sr">0</b></span><div class="bar"><i id="br"></i></div></div>
+          <div class="score-row"><span>Information gain <b id="si">0</b></span><div class="bar"><i id="bi"></i></div></div>
+          <div class="score-row"><span>Switching cost <b id="sc">0</b></span><div class="bar neg"><i id="bc"></i></div></div>
+          <div class="total"><span>TOTAL SCORE</span><b id="score">0.000</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="row3" id="tracks">
+      <div class="card">
+        <div class="panel-head"><div><div class="ey">CURRENT SCAN</div><h3>Receiver Console</h3></div><span class="ey">LIVE</span></div>
+        <div class="console"><div class="bigfreq" id="cf">0.900<span> GHz</span></div><div class="progress"><i id="prog"></i></div><div class="meta"><span>DWELL <b>80 ms</b></span><span>SWITCH <b>4 ms</b></span><span>BW <b>20 MHz</b></span></div></div>
+        <div class="result"><div class="state" id="status">WAITING FOR OBSERVATION</div><div class="result-grid"><div><small>LAST RESULT</small><b id="last">—</b></div><div><small>HITS</small><b id="hits">0</b></div><div><small>MISSES</small><b id="misses">0</b></div></div></div>
+      </div>
+      <div class="card"><div class="panel-head"><div><div class="ey">TRACK SUMMARY</div><h3>Detected Contacts</h3></div><span id="tc" style="font:9px ui-monospace,monospace;color:var(--cyan)">0</span></div><div class="scroll" id="tracksList"><div class="empty">No contacts yet. Run the receiver.</div></div></div>
+      <div class="card"><div class="panel-head"><div><div class="ey">EVENT LOG</div><h3>Decision Timeline</h3></div><button class="btn" id="clear" style="padding:5px 7px">Clear</button></div><div class="scroll" id="log"></div></div>
+    </section>
+
+    <section class="card compare" id="performance">
+      <div class="panel-head"><div><div class="ey">BASELINE COMPARISON</div><h3>Same receiver · different scan policy</h3></div><span class="ey">SIMULATION</span></div>
+      <div class="table">
+        <div class="tr th"><span>POLICY</span><span>PI</span><span>AIT</span><span>HITS</span><span>RELATIVE EFFICIENCY</span></div>
+        <div class="tr"><span>● BAPS</span><b id="bpi">0%</b><span id="bait">—</span><span id="bh">0</span><div class="bar2"><i id="bb"></i></div></div>
+        <div class="tr"><span>● Sequential</span><b id="spi">0%</b><span id="sait">—</span><span id="sh">0</span><div class="bar2"><i id="sb"></i></div></div>
+        <div class="tr"><span>● Random</span><b id="rpi">0%</b><span id="rait">—</span><span id="rh">0</span><div class="bar2"><i id="rb"></i></div></div>
+        <div class="tr"><span>● Greedy</span><b id="gpi">0%</b><span id="gait">—</span><span id="gh">0</span><div class="bar2"><i id="gb"></i></div></div>
+      </div>
+    </section>
+
+    <section class="bottom">
+      <div class="card">
+        <div class="panel-head"><div><div class="ey">BELIEF STATE</div><h3>Band Activity Probability</h3></div><span class="ey">BETA(α, β)</span></div>
+        <div class="beliefs" id="beliefs"></div>
+      </div>
+      <div class="card">
+        <div class="panel-head"><div><div class="ey">CLOSED LOOP</div><h3>BAPS Reasoning Cycle</h3></div></div>
+        <div class="flow"><span>OBSERVE</span>→<span>UPDATE</span>→<span>PREDICT</span>→<span>EXPLORE / EXPLOIT</span>→<span>SCAN</span>→<span>HIT / MISS</span>↺</div>
+        <div class="arch"><div><b>Unknown ≠ 0</b><span>Unscanned bands remain uncertain.</span></div><div><b>Predict before scan</b><span>Temporal activity guides the next action.</span></div><div><b>Learn online</b><span>Every observation updates the belief state.</span></div></div>
+      </div>
+    </section>
+
+    <section class="intel">
+      <div class="card mini"><div class="panel-head"><div><div class="ey">SPATIAL VIEW</div><h3>Emitter Activity Radar</h3></div><span class="ey">LIVE</span></div><div class="mini-note"><span>CONTACTS <b id="radarContacts">0</b></span><span>SELECTED <b id="radarBand">B-01</b></span></div><canvas id="radar"></canvas></div>
+      <div class="card mini"><div class="panel-head"><div><div class="ey">SIGNAL DETAIL</div><h3>Waterfall / Instantaneous Trace</h3></div><span class="ey">20 MHz BW</span></div><div class="mini-note"><span>FREQUENCY <b id="traceFreq">900 MHz</b></span><span>DWELL <b>80 ms</b></span></div><canvas id="waterfall"></canvas></div>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="modal-card"><div class="ey">BAPS EXPLAINER</div><h2>Why did the scheduler choose this band?</h2><p>BAPS combines current belief, predicted activity, uncertainty, revisit urgency, information gain and switching cost. The prototype visualizes the decision so an operator can inspect the reasoning instead of receiving a black-box action.</p><div class="modal-grid"><div class="modal-item"><b>OBSERVE</b><span>Receiver produces the latest spectrum observation.</span></div><div class="modal-item"><b>UPDATE</b><span>Band beliefs change after every hit or miss.</span></div><div class="modal-item"><b>PREDICT</b><span>Temporal activity influences the next candidate.</span></div><div class="modal-item"><b>SCHEDULE</b><span>The highest composite score becomes the next scan.</span></div><div class="modal-item"><b>LEARN</b><span>New observations feed the next decision cycle.</span></div><div class="modal-item"><b>COMPARE</b><span>Baselines use the same simulated receiver conditions.</span></div></div><div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn primary" id="closeModal">Close</button></div></div></div>
+
+<script>
+const $=id=>document.getElementById(id), pct=x=>(x*100).toFixed(1)+"%", band=i=>"B-"+String(i+1).padStart(2,"0"), freq=i=>900+i*430;
+const S={bands:18,scenario:"mixed",policy:"baps",selected:0,cycle:0,ms:0,hit:0,miss:0,fa:0,ops:0,belief:[],a:[],b:[],heat:[],history:[],tracks:[],times:[],last:"—",auto:false,log:[],base:{baps:{h:0,o:0,t:[]},sequential:{h:0,o:0,t:[]},random:{h:0,o:0,t:[]},greedy:{h:0,o:0,t:[]}}};
+
+function truth(i,t){
+  let p=.025,ph=Math.floor(t/850),hop=[2,7,11,15,3,9,14,5,12,16][ph%10]%S.bands;
+  let per=Math.sin(t/520+i*.9)>.56;
+  if(i===4)p+=.42;if(i===12%S.bands)p+=.33;
+  if(S.scenario==="periodic")p+=per?.50:0;
+  if(S.scenario==="hopping")p+=(i===hop||i===(hop+5)%S.bands)?.62:0;
+  if(S.scenario==="emerging")p+=(t>4500&&i===Math.floor(S.bands*.72))?.72:0;
+  if(S.scenario==="dense")p+=(i%4===0||i%7===0)?.38:0;
+  if(S.scenario==="mixed")p+=per?.24:0;
+  if(S.scenario==="mixed"||S.scenario==="periodic")p+=i===hop?.42:0;
+  return Math.max(0,Math.min(1,p));
+}
+function init(){
+  S.a=Array(S.bands).fill(1);S.b=Array(S.bands).fill(1);
+  S.belief=Array.from({length:S.bands},(_,i)=>.12+.42*Math.random()+(i%7===2?.25:0));
+  S.heat=Array.from({length:42},()=>Array(S.bands).fill(0).map(()=>Math.random()*.1));
+  S.history=[];S.tracks=[];S.cycle=S.ms=S.hit=S.miss=S.fa=S.ops=0;S.times=[];S.last="—";S.log=[];
+  Object.keys(S.base).forEach(k=>S.base[k]={h:0,o:0,t:[]});
+  addLog("SYS","Scenario initialized · "+S.scenario.toUpperCase());render();
+}
+function score(i){
+  let p=.55*S.belief[i]+.45*truth(i,S.ms),u=1-Math.abs(S.belief[i]-.5)*2,idx=S.history.indexOf(i),r=idx<0?1:Math.min(1,idx/10),ig=u*(.65+.35*p),c=i===S.selected?0:.1;
+  return {p,u,r,ig,c,total:.42*p+.2*u+.16*r+.17*ig-.05*c};
+}
+function choose(){
+  if(S.policy==="sequential")return(S.selected+1)%S.bands;
+  if(S.policy==="random")return Math.floor(Math.random()*S.bands);
+  if(S.policy==="greedy")return S.belief.indexOf(Math.max(...S.belief));
+  let bi=0,bs=-1;for(let i=0;i<S.bands;i++){let x=score(i);if(x.total>bs){bs=x.total;bi=i}}return bi;
+}
+function addLog(type,msg){S.log.unshift({t:new Date().toLocaleTimeString([],{hour12:false}),type,msg});S.log=S.log.slice(0,28)}
+function toast(msg){let t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),1800)}
+function cycle(){
+  let i=choose();S.selected=i;
+  let hit=Math.random()<(.84*truth(i,S.ms)+.02),fa=!hit&&Math.random()<.018;
+  S.ops++;hit?S.hit++:S.miss++;if(fa)S.fa++;
+  S.a[i]+=hit?1:0;S.b[i]+=hit?0:1;S.belief[i]=S.a[i]/(S.a[i]+S.b[i]);
+  S.last=hit?"HIT":"MISS";S.ms+=80;S.cycle++;S.history.unshift(i);S.history=S.history.slice(0,30);
+  if(hit){let t=S.ms/1000;S.times.push(t);S.tracks.unshift({id:"T-"+String(S.tracks.length+1).padStart(2,"0"),i,t});if(S.tracks.length>6)S.tracks.pop()}
+  S.heat.push(Array.from({length:S.bands},(_,j)=>Math.min(1,.08+.78*truth(j,S.ms)+Math.random()*.16)));if(S.heat.length>42)S.heat.shift();
+  addLog(hit?"HIT":"MISS",(hit?"Intercepted ":"Scanned ")+band(i)+" · "+freq(i)+" MHz · dwell 80 ms");
+  if(S.hit>=3&&S.hit/S.ops>.45&&!document.body.classList.contains("alert")){document.body.classList.add("alert");$("panicBanner").classList.add("on");}
+  render();
+}
+function baseStep(k){
+  let b=S.base[k],i=k==="sequential"?b.o%S.bands:k==="random"?Math.floor(Math.random()*S.bands):k==="greedy"?S.belief.indexOf(Math.max(...S.belief)):S.selected;
+  let h=Math.random()<(.84*truth(i,S.ms)+.02);b.o++;if(h){b.h++;b.t.push(S.ms/1000)}
+}
+function render(){
+  let pi=S.ops?S.hit/S.ops:0,ait=S.times.length?S.times.reduce((a,b)=>a+b,0)/S.times.length:null;
+  $("pi").textContent=pct(pi);$("pd").textContent=pct(pi);$("pfa").textContent=pct(S.ops?S.fa/S.ops:0);
+  $("ait").textContent=ait==null?"—":ait.toFixed(2)+" s";$("aitn").textContent=S.times.length+" intercepts";
+  $("hm").textContent=S.hit+" / "+S.ops;$("fa").textContent=S.fa+" false";$("cycles").textContent=S.cycle;
+  $("sim").textContent="00:"+String(Math.floor(S.ms/60000)).padStart(2,"0")+":"+String(Math.floor(S.ms/1000)%60).padStart(2,"0")+"."+String(S.ms%1000).padStart(3,"0");
+  let x=score(S.selected);
+  $("db").textContent=band(S.selected);$("df").textContent=freq(S.selected)+" MHz";$("dd").textContent=(60+Math.round(x.u*60))+" ms";
+  $("cf").innerHTML=(freq(S.selected)/1000).toFixed(3)+"<span> GHz</span>";$("traceFreq").textContent=freq(S.selected)+" MHz";$("radarBand").textContent=band(S.selected);
+  $("sp").textContent=x.p.toFixed(2);$("su").textContent=x.u.toFixed(2);$("sr").textContent=x.r.toFixed(2);$("si").textContent=x.ig.toFixed(2);$("sc").textContent=x.c.toFixed(2);$("score").textContent=x.total.toFixed(3);
+  [["bp",x.p],["bu",x.u],["br",x.r],["bi",x.ig],["bc",x.c]].forEach(([id,v])=>$(id).style.width=(v*100)+"%");
+  $("ring").style.background=`conic-gradient(var(--cyan) 0 ${Math.max(30,x.total*360)}deg,#17323c ${Math.max(30,x.total*360)}deg)`;
+  $("last").textContent=S.last;$("hits").textContent=S.hit;$("misses").textContent=S.miss;$("status").textContent=S.last==="—"?"WAITING FOR OBSERVATION":S.last+" · RECEIVER UPDATED";
+  $("tc").textContent=S.tracks.length;$("radarContacts").textContent=S.tracks.length;
+  $("tracksList").innerHTML=S.tracks.length?S.tracks.map(t=>`<div class="track"><div class="avatar">${t.id.slice(-2)}</div><div><b>${t.id} · ${band(t.i)}</b><br><small>${freq(t.i)} MHz · T+${t.t.toFixed(2)} s</small></div><span class="green">${pct(.5+S.belief[t.i]*.45)}</span></div>`).join(""):'<div class="empty">No contacts yet. Run the receiver.</div>';
+  $("log").innerHTML=S.log.map(e=>`<div class="event ${e.type==="HIT"?"hit":e.type==="MISS"?"miss":""}"><time>${e.t}</time><span class="type">${e.type}</span><span>${e.msg}</span></div>`).join("");
+  $("beliefs").innerHTML=Array.from({length:Math.min(18,S.bands)},(_,i)=>`<div class="bc">${Math.round(S.belief[i]*100)}%<div class="bt"><i style="height:${S.belief[i]*100}%"></i></div>${band(i)}</div>`).join("");
+  for(let j=0;j<2;j++)["baps","sequential","random","greedy"].forEach(baseStep);renderBase();drawHeat();drawRadar();drawWaterfall();
+}
+function renderBase(){
+  for(let [k,p] of Object.entries({baps:"b",sequential:"s",random:"r",greedy:"g"})){
+    let b=S.base[k],pi=b.o?b.h/b.o:0,ait=b.t.length?b.t.reduce((a,x)=>a+x,0)/b.t.length:null;
+    $(p+"pi").textContent=pct(pi);$(p+"ait").textContent=ait==null?"—":ait.toFixed(2)+" s";$(p+"h").textContent=b.h;$(p+"b").style.width=pi*100+"%";
+  }
+}
+function setupCanvas(c,ratio=1){
+  let r=c.getBoundingClientRect(),d=devicePixelRatio||1,w=r.width,h=r.height||r.width*ratio;
+  c.width=w*d;c.height=h*d;let x=c.getContext("2d");x.setTransform(d,0,0,d,0,0);return [x,w,h];
+}
+function drawHeat(){
+  let [x,w,h]=setupCanvas($("heatmap")),rows=S.heat.length,cols=S.bands,cw=w/cols,rh=h/rows;
+  x.fillStyle="#040d12";x.fillRect(0,0,w,h);
+  for(let y=0;y<rows;y++)for(let i=0;i<cols;i++){let v=S.heat[y][i],hue=190-150*v,li=11+39*v;x.fillStyle=`hsl(${hue} 72% ${li}%)`;x.fillRect(i*cw,y*rh,cw+.6,rh+.6)}
+  x.strokeStyle="rgba(150,220,230,.08)";for(let i=0;i<cols;i+=3){x.beginPath();x.moveTo(i*cw,0);x.lineTo(i*cw,h);x.stroke()}
+  let sx=S.selected*cw+cw/2;x.strokeStyle="#fff";x.shadowColor="#5cecff";x.shadowBlur=9;x.beginPath();x.moveTo(sx,0);x.lineTo(sx,h);x.stroke();x.shadowBlur=0;
+}
+function drawRadar(){
+  let [x,w,h]=setupCanvas($("radar"),1),cx=w/2,cy=h/2,r=Math.min(w,h)*.37;x.clearRect(0,0,w,h);
+  x.strokeStyle="rgba(55,217,234,.18)";x.lineWidth=1;[.33,.66,1].forEach(q=>{x.beginPath();x.arc(cx,cy,r*q,0,Math.PI*2);x.stroke()});
+  x.beginPath();x.moveTo(cx-r,cy);x.lineTo(cx+r,cy);x.moveTo(cx,cy-r);x.lineTo(cx,cy+r);x.stroke();
+  let sweep=(Date.now()/1400)%(Math.PI*2);x.strokeStyle="rgba(55,217,234,.65)";x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(sweep)*r,cy+Math.sin(sweep)*r);x.stroke();
+  S.tracks.forEach((t,n)=>{let a=(t.i/S.bands)*Math.PI*2,rr=r*(.28+.1*(n%4)),px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr;x.fillStyle=n===0?"#54e3a2":"#37d9ea";x.shadowColor=x.fillStyle;x.shadowBlur=10;x.beginPath();x.arc(px,py,n===0?4:3,0,Math.PI*2);x.fill()});
+  x.shadowBlur=0;x.fillStyle="#5d7b85";x.font="7px monospace";x.fillText("N",cx-3,cy-r-7);x.fillText("S",cx-3,cy+r+12);x.fillText("W",cx-r-12,cy+3);x.fillText("E",cx+r+6,cy+3);
+}
+function drawWaterfall(){
+  let [x,w,h]=setupCanvas($("waterfall"),.35);x.fillStyle="#030b10";x.fillRect(0,0,w,h);
+  for(let yy=0;yy<h;yy+=3)for(let xx=0;xx<w;xx+=3){let bandv=truth(Math.floor(xx/w*S.bands),S.ms-yy*12),noise=Math.random()*.13,v=Math.min(1,bandv+noise);let hue=190-150*v;x.fillStyle=`hsl(${hue} 75% ${10+45*v}%)`;x.fillRect(xx,yy,3,3)}
+  x.strokeStyle="#fff";x.beginPath();x.moveTo((S.selected+.5)/S.bands*w,0);x.lineTo((S.selected+.5)/S.bands*w,h);x.stroke();
+}
+$("run").onclick=cycle;
+let timer=null;$("auto").onclick=()=>{S.auto=!S.auto;$("auto").textContent="AUTO · "+(S.auto?"ON":"OFF");if(S.auto){timer=setInterval(cycle,430)}else clearInterval(timer)};
+$("clear").onclick=()=>{S.log=[];render();toast("Event log cleared")};
+$("scenario").onchange=e=>{S.scenario=e.target.value;init();toast("Scenario changed")};
+$("bands").onchange=e=>{S.bands=+e.target.value;init()};
+$("policy").onchange=e=>{S.policy=e.target.value;addLog("POLICY","Scheduler → "+e.target.options[e.target.selectedIndex].text);render();toast("Policy updated")};
+document.querySelectorAll(".mode button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".mode button").forEach(x=>x.classList.remove("active"));b.classList.add("active");$("modeLabel").textContent=b.textContent;toast(b.textContent+" mode")});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");let el=$(b.dataset.section);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})});
+$("help").onclick=()=>$("modal").classList.add("open");$("closeModal").onclick=()=>$("modal").classList.remove("open");$("modal").onclick=e=>{if(e.target.id==="modal")$("modal").classList.remove("open")};
+$("panic").onclick=()=>{let on=document.body.classList.toggle("alert");$("panicBanner").classList.toggle("on",on);toast(on?"Priority alert enabled":"Priority alert cleared")};
+$("export").onclick=()=>{let data={product:"Akash Chakra",engine:"BAPS",scenario:S.scenario,policy:S.policy,bands:S.bands,cycles:S.cycle,hits:S.hit,misses:S.miss,PI:S.ops?S.hit/S.ops:0,AIT:S.times.length?S.times.reduce((a,b)=>a+b,0)/S.times.length:null,contacts:S.tracks,events:S.log,generated_at:new Date().toISOString()};let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="akash-chakra-baps-run.json";a.click();URL.revokeObjectURL(a.href);toast("Run exported")};
+setInterval(()=>{$("clock").textContent=new Date().toLocaleTimeString([],{hour12:false})},500);
+setInterval(()=>{drawRadar()},120);
+window.addEventListener("resize",()=>{drawHeat();drawRadar();drawWaterfall()});
+init();
+</script>
+</body>
+</html>

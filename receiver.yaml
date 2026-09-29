@@ -1,0 +1,23 @@
+receiver:
+
+  bandwidth: 10.0
+
+  minimum_dwell: 1.0
+
+  maximum_dwell: 5.0
+
+  switching_time: 0.5
+
+
+spectrum:
+
+  start_frequency: 50
+
+  end_frequency: 400
+
+  number_of_bands: 36
+
+
+environment:
+
+  seed: 42
